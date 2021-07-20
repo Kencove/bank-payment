@@ -40,6 +40,7 @@ class PaymentOrder(models.Model):
                         "inv_amount": "Invoice Amount",
                         "credit_amount": "Credit Amount",
                         "due_amount": "Due Amount",
+                        "ref": "Reference",
                     }
                     line_data.append(header_data)
                     for payment_line in bank_line.payment_line_ids:
@@ -61,6 +62,7 @@ class PaymentOrder(models.Model):
                             "inv_amount": payment_line.move_line_id.move_id.amount_total,
                             "credit_amount": payment_line.move_line_id.move_id.amount_untaxed,
                             "due_amount": payment_line.move_line_id.move_id.amount_residual,
+                            "ref": payment_line.move_line_id.move_id.ref
                         }
                         line_data.append(line_dict)
                     template = rec.payment_mode_id.email_temp_id
