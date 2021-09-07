@@ -467,7 +467,7 @@ class AccountPaymentOrder(models.Model):
             vals.update({"date_maturity": bank_lines[0].date})
 
         if self.payment_mode_id.offsetting_account == "bank_account":
-            account_id = self.journal_id.default_account_id.id
+            account_id = self.journal_id.payment_debit_account_id.id
         elif self.payment_mode_id.offsetting_account == "transfer_account":
             account_id = self.payment_mode_id.transfer_account_id.id
         partner_id = False
