@@ -30,6 +30,7 @@ class CancelVoidPaymentLine(models.TransientModel):
             move_id.with_context(include_business_fields=True).copy_data(
                 {
                     "date": new_move_date,
+                    "invoice_date": new_move_date,
                     "journal_id": move_id.journal_id.id,
                     "ref": (_("Reversal of: %s")) % (move_id.name),
                     "move_type": "in_refund",
