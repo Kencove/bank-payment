@@ -28,7 +28,6 @@ class AccountPaymentOrder(models.Model):
     )
     payment_type = fields.Selection(
         selection=[("inbound", "Inbound"), ("outbound", "Outbound")],
-        string="Payment Type",
         readonly=True,
         required=True,
     )
@@ -178,10 +177,10 @@ class AccountPaymentOrder(models.Model):
             ):
                 raise ValidationError(
                     _(
-                        "The payment type (%s) is not the same as the payment "
-                        "type of the payment mode (%s)"
+                        "The payment type (%(order.payment_type)s) "
+                        "is not the same as the payment type of the "
+                        "payment mode (%(order.payment_mode_id.payment_type)s)"
                     )
-                    % (order.payment_type, order.payment_mode_id.payment_type)
                 )
 
     @api.constrains("date_scheduled")
@@ -192,10 +191,9 @@ class AccountPaymentOrder(models.Model):
                 if order.date_scheduled < today:
                     raise ValidationError(
                         _(
-                            "On payment order %s, the Payment Execution Date "
-                            "is in the past (%s)."
+                            "On payment order %(order.name)s, the Payment Execution Date "
+                            "is in the past (%(order.date_scheduled)s)."
                         )
-                        % (order.name, order.date_scheduled)
                     )
 
     @api.depends("payment_line_ids", "payment_line_ids.amount_company_currency")
@@ -316,17 +314,17 @@ class AccountPaymentOrder(models.Model):
                 ):
                     raise UserError(
                         _(
-                            "The payment mode '%s' has the option "
+                            "The payment mode '%(order_name)s' has the option "
                             "'Disallow Debit Before Maturity Date'. The "
-                            "payment line %s has a maturity date %s "
-                            "which is after the computed payment date %s."
+                            "payment line %(line_name)s has a maturity date %(maturity_date)s "
+                            "which is after the computed payment date %(requested_date)s."
                         )
-                        % (
-                            order.payment_mode_id.name,
-                            payline.name,
-                            payline.ml_maturity_date,
-                            requested_date,
-                        )
+                        % {
+                            "order_name": order.payment_mode_id.name,
+                            "line_name": payline.name,
+                            "maturity_date": payline.ml_maturity_date,
+                            "requested_date": requested_date,
+                        }
                     )
                 # Write requested_date on 'date' field of payment line
                 # norecompute is for avoiding a chained recomputation
@@ -355,8 +353,14 @@ class AccountPaymentOrder(models.Model):
                 # Block if a bank payment line is <= 0
                 if paydict["total"] <= 0:
                     raise UserError(
-                        _("The amount for Partner '%s' is negative " "or null (%.2f) !")
-                        % (paydict["paylines"][0].partner_id.name, paydict["total"])
+                        _(
+                            "The amount for Partner '%(name)s' is negative "
+                            "or null (%(total).2f) !"
+                        )
+                        % {
+                            "name": paydict["paylines"][0].partner_id.name,
+                            "total": paydict["total"],
+                        }
                     )
                 vals = self._prepare_bank_payment_line(paydict["paylines"])
                 bplo.create(vals)

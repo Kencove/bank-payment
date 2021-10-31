@@ -132,7 +132,6 @@
         <field name="model">account.payment.order</field>
         <field name="arch" type="xml">
             <tree
-                string="Payment Orders"
                 decoration-info="state=='draft'"
                 decoration-success="state=='generated'"
                 decoration-danger="state=='open'"

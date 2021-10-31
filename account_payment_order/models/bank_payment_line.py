@@ -70,7 +70,7 @@ class BankPaymentLine(models.Model):
     communication_type = fields.Selection(
         related="payment_line_ids.communication_type", readonly=True
     )
-    communication = fields.Char(string="Communication", required=True, readonly=True)
+    communication = fields.Char(required=True, readonly=True)
     company_id = fields.Many2one(
         comodel_name="res.company",
         related="order_id.payment_mode_id.company_id",
@@ -160,27 +160,36 @@ class BankPaymentLine(models.Model):
                 raise UserError(
                     _(
                         "Can not reconcile: no move line for "
-                        "payment line %s of partner '%s'."
+                        "payment line %(line_name)s of partner '%(partner_name)s'."
                     )
-                    % (payment_line.name, payment_line.partner_id.name)
+                    % {
+                        "line_name": payment_line.name,
+                        "partner_name": payment_line.partner_id.name,
+                    }
                 )
             if payment_line.move_line_id.reconciled:
                 raise UserError(
-                    _("Move line '%s' of partner '%s' has already " "been reconciled")
-                    % (payment_line.move_line_id.name, payment_line.partner_id.name)
+                    _(
+                        "Move line '%(line_name)s' of partner '%(partner_name)s' has already "
+                        "been reconciled"
+                    )
+                    % {
+                        "line_name": payment_line.move_line_id.name,
+                        "partner_name": payment_line.partner_id.name,
+                    }
                 )
             if payment_line.move_line_id.account_id != transit_mline.account_id:
                 raise UserError(
                     _(
-                        "For partner '%s', the account of the account "
-                        "move line to pay (%s) is different from the "
-                        "account of of the transit move line (%s)."
+                        "For partner '%(name)s', the account of the account "
+                        "move line to pay (%(payment_code)s) is different from the "
+                        "account of of the transit move line (%(line_code)s)."
                     )
-                    % (
-                        payment_line.move_line_id.partner_id.name,
-                        payment_line.move_line_id.account_id.code,
-                        transit_mline.account_id.code,
-                    )
+                    % {
+                        "name": payment_line.move_line_id.partner_id.name,
+                        "payment_code": payment_line.move_line_id.account_id.code,
+                        "line_code": transit_mline.account_id.code,
+                    }
                 )
 
             lines_to_rec += payment_line.move_line_id

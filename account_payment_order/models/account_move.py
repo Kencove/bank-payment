@@ -23,7 +23,6 @@ class AccountMove(models.Model):
     # payment mode or company level
     reference_type = fields.Selection(
         selection=[("none", "Free Reference"), ("structured", "Structured Reference")],
-        string="Reference Type",
         required=True,
         readonly=True,
         states={"draft": [("readonly", False)]},
@@ -55,7 +54,6 @@ class AccountMove(models.Model):
     def create_account_payment_line(self):
         apoo = self.env["account.payment.order"]
         result_payorder_ids = []
-        action_payment_type = "debit"
         for move in self:
             if move.state != "posted":
                 raise UserError(_("The invoice %s is not in Posted state") % move.name)
@@ -93,7 +91,7 @@ class AccountMove(models.Model):
                     )
                     new_payorder = True
                 result_payorder_ids.append(payorder.id)
-                action_payment_type = payorder.payment_type
+                # payorder.payment_type
                 count = 0
                 for line in applicable_lines.filtered(
                     lambda x: x.payment_mode_id == payment_mode
@@ -103,22 +101,19 @@ class AccountMove(models.Model):
                 if new_payorder:
                     move.message_post(
                         body=_(
-                            "%d payment lines added to the new draft payment "
-                            "order %s which has been automatically created."
+                            "%(count)d payment lines added to the new draft payment "
+                            "order %(payorder.name)s which has been automatically created."
                         )
-                        % (count, payorder.name)
                     )
                 else:
                     move.message_post(
                         body=_(
-                            "%d payment lines added to the existing draft "
-                            "payment order %s."
+                            "%(count)d payment lines added to the existing draft "
+                            "payment order %(payorder.name)s."
                         )
-                        % (count, payorder.name)
                     )
         action = self.env["ir.actions.act_window"]._for_xml_id(
-            "account_payment_order.account_payment_order_%s_action"
-            % action_payment_type,
+            "account_payment_order.account_payment_order_%(action_payment_type)s_action"
         )
         if len(result_payorder_ids) == 1:
             action.update(
