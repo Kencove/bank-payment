@@ -30,15 +30,11 @@ class AccountPaymentLine(models.Model):
             ):
                 raise ValidationError(
                     _(
-                        "The payment line number %s has the bank account "
-                        "'%s' which is not attached to the mandate '%s' (this "
-                        "mandate is attached to the bank account '%s')."
-                    )
-                    % (
-                        pline.name,
-                        pline.partner_bank_id.acc_number,
-                        pline.mandate_id.unique_mandate_reference,
-                        pline.mandate_id.partner_bank_id.acc_number,
+                        "The payment line number %(pline.name)s has the bank account "
+                        "'%(pline.partner_bank_id.acc_number)s' which is not attached "
+                        "to the mandate '%(pline.mandate_id.unique_mandate_reference)s' (this "
+                        "mandate is attached to the bank account "
+                        "'%(pline.mandate_id.partner_bank_id.acc_number)s')."
                     )
                 )
 
@@ -51,10 +47,9 @@ class AccountPaymentLine(models.Model):
             ):
                 raise ValidationError(
                     _(
-                        "The payment line number %s a different company than "
-                        "that of the linked mandate %s)."
+                        "The payment line number %(pline.name)s a different company than "
+                        "that of the linked mandate %(pline.mandate_id.display_name)s)."
                     )
-                    % (pline.name, pline.mandate_id.display_name)
                 )
 
     def draft2open_payment_line_check(self):
