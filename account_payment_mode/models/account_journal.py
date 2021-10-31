@@ -41,11 +41,10 @@ class AccountJournal(models.Model):
             if mode:
                 raise ValidationError(
                     _(
-                        "The company of the journal '%s' does not match "
-                        "with the company of the payment mode '%s' where it is "
+                        "The company of the journal '%(journal.name)s' does not match "
+                        "with the company of the payment mode '%(mode.name)s' where it is "
                         "being used as Fixed Bank Journal."
                     )
-                    % (journal.name, mode.name)
                 )
             mode = self.env["account.payment.mode"].search(
                 [
@@ -57,9 +56,8 @@ class AccountJournal(models.Model):
             if mode:
                 raise ValidationError(
                     _(
-                        "The company of the journal '%s' does not match "
-                        "with the company of the payment mode '%s' where it is "
+                        "The company of the journal '%(journal.name)s' does not match "
+                        "with the company of the payment mode '%(mode.name)s' where it is "
                         "being used in the Allowed Bank Journals."
                     )
-                    % (journal.name, mode.name)
                 )

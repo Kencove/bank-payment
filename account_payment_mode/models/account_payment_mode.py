@@ -92,15 +92,10 @@ class AccountPaymentMode(models.Model):
                     ):
                         raise ValidationError(
                             _(
-                                "On the payment mode '%s', the payment method "
-                                "is '%s', but this payment method is not part "
-                                "of the payment methods of the fixed bank "
-                                "journal '%s'"
-                            )
-                            % (
-                                mode.name,
-                                mode.payment_method_id.name,
-                                mode.fixed_journal_id.name,
+                                "On the payment mode '%(mode.name)s', the payment method "
+                                "is '%(mode.payment_method_id.name)s', but this payment "
+                                "method is not part of the payment methods of the fixed bank "
+                                "journal '%(mode.fixed_journal_id.name)s'"
                             )
                         )
                 else:
@@ -110,16 +105,12 @@ class AccountPaymentMode(models.Model):
                     ):
                         raise ValidationError(
                             _(
-                                "On the payment mode '%s', the payment method "
-                                "is '%s' (it is in fact a debit method), "
+                                "On the payment mode '%(mode.name)s', the payment method "
+                                "is '%(mode.payment_method_id.name)s' "
+                                "(it is in fact a debit method), "
                                 "but this debit method is not part "
                                 "of the debit methods of the fixed bank "
-                                "journal '%s'"
-                            )
-                            % (
-                                mode.name,
-                                mode.payment_method_id.name,
-                                mode.fixed_journal_id.name,
+                                "journal '%(mode.fixed_journal_id.name)s'"
                             )
                         )
 
