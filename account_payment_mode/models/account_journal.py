@@ -22,9 +22,11 @@ class AccountJournal(models.Model):
         return all_in
 
     outbound_payment_method_ids = fields.Many2many(
+        'account.payment.method', 'account_journal_outbound_payment_methods_rel',
         default=_default_outbound_payment_methods
     )
     inbound_payment_method_ids = fields.Many2many(
+        'account.payment.method', 'account_journal_inbound_payment_methods_rel',
         default=_default_inbound_payment_methods
     )
 
