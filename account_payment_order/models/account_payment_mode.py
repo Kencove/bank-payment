@@ -83,6 +83,27 @@ class AccountPaymentMode(models.Model):
         default="date",
     )
     post_move = fields.Boolean(default=True)
+    offsetting_account = fields.Selection(
+        selection=[
+            ("bank_account", "Bank Account"),
+            ("transfer_account", "Transfer Account"),
+        ],
+        default="bank_account",
+    )
+    transfer_account_id = fields.Many2one(
+        comodel_name="account.account",
+        domain=[("reconcile", "=", True)],
+        help="Pay off lines in 'file uploaded' payment orders with a move on "
+        "this account. You can only select accounts "
+        "that are marked for reconciliation",
+        check_company=True,
+    )
+    transfer_journal_id = fields.Many2one(
+        comodel_name="account.journal",
+        help="Journal to write payment entries when confirming "
+        "payment/debit orders of this mode",
+        check_company=True,
+    )
 
     @api.constrains("generate_move", "move_option")
     def transfer_move_constrains(self):
